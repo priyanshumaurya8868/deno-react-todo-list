@@ -1,5 +1,15 @@
-let msg : String;
+import { Application } from "https://deno.land/x/oak/mod.ts";
 
-msg = 'something to print'
+const app = new Application()
 
-console.log(msg)
+app.use((ctx)=>{
+  ctx.response.body = "Hellow World (from deno+oak)"
+})
+
+await app.listen({port : 8000})
+
+
+//using oak lib oak
+// A middleware framework for Deno's native HTTP server,
+// This middleware framework is inspired by Koa
+// ~ to expressjs
