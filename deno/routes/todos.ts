@@ -1,7 +1,7 @@
 import { Router } from "https://deno.land/x/oak@v11.0.0/mod.ts";
-import { ObjectId } from "https://deno.land/x/mongo@v0.8.0/mod.ts";
+import { ObjectId } from  "https://deno.land/x/mongo@v0.31.0/mod.ts";
 
-import { getDb } from "../helpers/db_client.ts";
+import { getDb, TodoSchema } from '../helpers/db_client.ts';
 
 const router = new Router();
 
@@ -10,15 +10,13 @@ interface Todo {
   text: string;
 }
 
-router.get("/todos", async (ctx) => {
-  const todos = await getDb().collection("todos").find();
-
-  const transformedTodos = todos.map(
+router.get('/todos', async (ctx) => {
+  const todos = await getDb().collection<TodoSchema>('todos').find(); // { _id: ObjectId(), text: '...' }[]
+  const transformedTodos :Array<Todo> = await todos.map(
     (todo: { _id: ObjectId; text: string }) => {
-      return { id: todo._id, text: todo.text };
+      return { id: todo._id.toString(), text: todo.text };
     }
   );
-
   ctx.response.body = { todos: transformedTodos };
 });
 
@@ -38,7 +36,7 @@ router.put("/todos/:todoId", async (ctx) => {
 
   await getDb()
     .collection("todos")
-    .updateOne({ _id: ObjectId(tid) }, { $set: { text: data.text } });
+    .updateOne({ _id: new ObjectId(tid) }, { $set: { text: data.text } });
 
   ctx.response.body = { message: "Updated todo" };
 });
@@ -48,7 +46,7 @@ router.delete("/todos/:todoId", async (ctx) => {
 
   await getDb()
     .collection("todos")
-    .deleteOne({ _id: ObjectId(tid) });
+    .deleteOne({ _id: new ObjectId(tid) });
 
   ctx.response.body = { message: "Deleted todo" };
 });

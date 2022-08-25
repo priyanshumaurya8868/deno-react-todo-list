@@ -1,15 +1,19 @@
-import { MongoClient, Database } from 'https://deno.land/x/mongo@v0.8.0/mod.ts';
+import { MongoClient, Database, ObjectId } from "https://deno.land/x/mongo@v0.31.0/mod.ts";
 
 let db : Database;
 
-export function connect(){
-    const client = new MongoClient()
-    client.connectWithUri(
-      'mongodb://localhost:27017'
-    )
+export async function connect(){
+  const client = new MongoClient();
+  // Connecting to a Local Database
+  await client.connect("mongodb://127.0.0.1:27017");
     db = client.database('denoTodo') //switching db
 }
 
 export function getDb(){
     return db
+}
+
+export interface TodoSchema {
+  _id : ObjectId;
+  text : string;
 }
